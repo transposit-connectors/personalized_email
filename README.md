@@ -10,7 +10,7 @@ There are a few problems with our workaround solutions previously:
   * Personalized content adds a human touch. Even though we may want consistency when it comes to process or message, it is nice to add personalized context to ground the email.
   * Copy/paste often leads to formatting errors that make the message content feel less engaging.
 
-We'd created a few of these email templating apps for internal use, including  for user outreach and recruiting. So we decided to create a generic email application that allows you to pass through some input fields to a custom template, preview the email, and send.
+We created a few of these email templating apps for internal use, including  for user outreach and recruiting. So we decided to create a generic email application that allows you to pass through some input fields to a custom template, preview the email, and send.
 
 Let’s start by visiting the hosted app page:
 
