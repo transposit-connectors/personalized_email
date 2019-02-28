@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- babel for JSX -->
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <!-- Transposit SDK -->
+  <script src="https://unpkg.com/transposit@^0.7.0/dist/bundle.prod.js"></script>
+
+
+  <script>
+    // These variables in triple curly braces are dynamically injected by Transposit and should not be modified
+    var maintainer = "{{{maintainer}}}";
+    var applicationName = "{{{applicationName}}}";
+    var host = "{{{host}}}";
+    var transposit = new Transposit.Transposit(maintainer, applicationName, host);
+  </script>
+</head>
+<body class="bg-light">
+<div class="container mt-3 mt-md-5">
+  <div class="form">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control" id="name" placeholder="" required>
+      <small id="emailHelp" class="form-text text-muted">You can pick any fields to pass into your email template. See
+        the extract function in the hosted app.
+      </small>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="text" class="form-control" id="email" placeholder="" required>
+    </div>
+    <div class="form-group">
+      <div id="email-preview"/>
+    </div>
+  </div>
+</div>
+
+<script type="text/babel">
+  class PreviewToggle extends React.Component {
+    render() {
+      const {preview, toggle} = this.props;
+
+      return (
+          <div className="btn-group btn-group-toggle mt-3" data-toggle="buttons">
+            <label className={"btn btn-secondary " + (preview ? 'active' : '')}>
+              <input type="radio" name="options" value="Preview"
+                     checked={preview} onChange={toggle}/>
+              Preview
+            </label>
+            <label className={"btn btn-secondary " + (preview ? '' : 'active')}>
+              <input type="radio" name="options" value="Edit"
+                     checked={!preview} onChange={toggle}/>
+              Edit
+            </label>
+          </div>
+      )
+    }
+  }
+
+  class EmailPreview extends React.Component {
+    StateEnum = {
+      EMPTY: 1,
+      PREVIEW: 2,
+      EDIT: 3,
+      SENT: 4,
+      ERROR: 5
+    };
+
+    constructor(props) {
+      super(props);
+      this.state = {
+        body: '',
+        subject: '',
+        state: this.StateEnum.EMPTY,
+        errorMessage: ''
+      };
+    }
+
+    preview() {
+      this.props.transposit.runOperation(this.props.previewOperation, this.props.extractInputs()).then((response) => {
+        if (response.status !== "SUCCESS") {
+          throw response;
+        }
+        this.setState({
+          body: response.result.results[0].body,
+          subject: response.result.results[0].subject,
+          state: this.StateEnum.PREVIEW
+        });
+      }).catch(() => {
+        this.setState({
+          state: this.StateEnum.ERROR,
+          errorMessage: "There was an error previewing your message"
+        })
+      });
+    }
+
+    send() {
+      var params = {
+        email: this.props.getEmail(),
+        subject: this.state.subject,
+        body: this.state.body
+      };
+      this.props.transposit.runOperation(this.props.sendOperation, params).then((response) => {
+        if (response.status !== "SUCCESS") {
+          throw response;
+        }
+        this.setState({
+          state: this.StateEnum.SENT
+        });
+      }).catch(() => {
+        this.setState({
+          state: this.StateEnum.ERROR,
+          errorMessage: "There was an error sending your message"
+        })
+      });
+    }
+
+    handleSubjectChange = (event) => {
+      this.setState({subject: event.target.value});
+    };
+
+    handleBodyChange = (event) => {
+      this.setState({body: event.target.value});
+    };
+
+    togglePreview(changeEvent) {
+      this.setState({
+        state: changeEvent.target.value === 'Edit' ? this.StateEnum.EDIT : this.StateEnum.PREVIEW
+      });
+    }
+
+    render() {
+      const {state, subject, body, errorMessage} = this.state;
+      if (state === this.StateEnum.EMPTY) {
+        return (
+            <button className="btn btn-primary"
+                    onClick={this.preview.bind(this)}>Preview
+            </button>
+        );
+      } else if (state === this.StateEnum.PREVIEW) {
+        const subjectDiv = {__html: subject};
+        const bodyDiv = {__html: body};
+        return (<div>
+          <PreviewToggle toggle={this.togglePreview.bind(this)} preview={state === this.StateEnum.PREVIEW}/>
+          <div className="mt-3">
+            <div>Subject</div>
+            <div className="bg-white p-2 mt-2 rounded text-muted" dangerouslySetInnerHTML={subjectDiv}/>
+            <div className="mt-3">
+              <div>Body</div>
+              <div className="bg-white p-2 mt-2 rounded text-muted" dangerouslySetInnerHTML={bodyDiv}/>
+            </div>
+          </div>
+          <div className="mt-3">
+            <button type="submit" onClick={this.send.bind(this)} className="btn btn-primary">Send</button>
+          </div>
+        </div>);
+      } else if (state === this.StateEnum.EDIT) {
+        const taStyle = {
+          height: '200px'
+        };
+
+
+        return (<div>
+          <PreviewToggle toggle={this.togglePreview.bind(this)} preview={state === this.StateEnum.PREVIEW}/>
+
+          <div className="form my-3">
+            <div className="form-group">
+              <label htmlFor="subject">Subject</label>
+              <input id="subject" type="text" className="form-control border-0" value={subject}
+                     onChange={this.handleSubjectChange}/>
+            </div>
+          </div>
+          <div className="form">
+            <div className="form-group">
+              <label htmlFor="body">Body</label>
+              <textarea id="body" className="form-control border-0" value={body}
+                      onChange={this.handleBodyChange} style={taStyle}/>
+            </div>
+          </div>
+          <div className="mt-2">
+            <button type="submit" onClick={this.send.bind(this)} className="btn btn-primary">Send</button>
+          </div>
+        </div>);
+      } else if (state === this.StateEnum.SENT) {
+        return (<div className="card mt-3">
+          <div className="card-body">
+            <h5 className="card-title">Success!</h5>
+            <div className="card-text">Successfully sent your message to {this.props.getEmail()}</div>
+          </div>
+        </div>);
+      } else {
+        return (<div className="card mt-3">
+          <div className="card-body">
+            <h5 className="card-title">Error</h5>
+            <div className="card-text">{errorMessage}</div>
+          </div>
+        </div>);
+      }
+    }
+  }
+
+  /**
+   * You can modify this function to change the parameters that get passed in to the preview operation. Be sure
+   * to add those parameters to the previewOperation set below.
+   */
+  function extract() {
+    return {
+      name: document.getElementById("name").value
+    }
+  }
+
+  /**
+   * This function returns the email address when you hit send
+   */
+  function getEmail() {
+    return document.getElementById("email").value;
+  }
+
+  ReactDOM.render(
+      <EmailPreview name="Preview" transposit={transposit} previewOperation="preview_deployed" sendOperation="send_email"
+                    extractInputs={extract} getEmail={getEmail}/>
+      , document.getElementById("email-preview"));
+</script>
+</body>
+</html>

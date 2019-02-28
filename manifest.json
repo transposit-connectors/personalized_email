@@ -1,18 +1,80 @@
 {
   "v2": {
     "transposit": {
+      "dependencies": [{
+        "name": "transposit/google_mail:v1.*.*",
+        "alias": "google_mail"
+      }],
       "operations": [{
-        "id": "hello_world",
-        "description": "Returns \"Hello, world\" in different languages",
+        "id": "send_html_email",
         "function": {
-          "js": "hello_world.js"
+          "parameters": [{
+            "name": "to",
+            "type": "STRING"
+          }, {
+            "name": "subject",
+            "type": "STRING"
+          }, {
+            "name": "messageHtml",
+            "type": "STRING"
+          }, {
+            "name": "cc",
+            "type": "STRING"
+          }, {
+            "name": "threadId",
+            "type": "STRING"
+          }, {
+            "name": "from",
+            "type": "STRING"
+          }],
+          "js": "send_html_email.js"
+        }
+      }, {
+        "id": "send_email",
+        "function": {
+          "parameters": [{
+            "name": "email",
+            "type": "STRING"
+          }, {
+            "name": "subject",
+            "type": "STRING"
+          }, {
+            "name": "body",
+            "type": "STRING"
+          }],
+          "js": "sendEmail.js"
+        },
+        "access": {
+          "requireUser": true
+        }
+      }, {
+        "id": "preview_deployed",
+        "function": {
+          "parameters": [{
+            "name": "name",
+            "type": "STRING"
+          }],
+          "js": "get_inputs.js"
         },
         "access": {
           "requireUser": true
         }
       }],
-      "javascriptAPIVersion": "3",
-      "source": "src"
-    }
+      "dataConnections": [{
+        "ref": "google_mail.raw",
+        "requireConsumerSignin": true,
+        "overrides": {
+          "swagger": {
+            "oauthConfig": {
+              "scope": "https://www.googleapis.com/auth/gmail.send"
+            },
+            "executionLimits": {
+            }
+          }
+        }
+      }],
+      "javascriptAPIVersion": "3"
+    },
+    "description": "Sample application for an email template."
   }
 }
