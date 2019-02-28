@@ -14,7 +14,7 @@ We'd created a few of these email templating apps for internal use, including  f
 
 Let’s start by visiting the hosted app page:
 
-[https://api.transposit.com/app/transposit-sample/personalized_email](https://api.transposit.com/app/transposit-sample/personalized_email)
+[https://personalized-email-j8a18.transposit.io](https://personalized-email-j8a18.transposit.io)
 
 Once you log in, you will be prompted for credentials for the Google account that you want to send the email from.
 
