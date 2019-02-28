@@ -75,6 +75,6 @@
       }],
       "javascriptAPIVersion": "3"
     },
-    "description": "Sample application for an email template."
+    "description": "Pass inputs to a custom email template, preview the email, and send."
   }
 }
