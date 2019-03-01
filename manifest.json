@@ -75,6 +75,6 @@
       }],
       "javascriptAPIVersion": "3"
     },
-    "description": "Pass inputs to a custom email template, preview the email, and send."
+    "description": "Pass inputs to a custom email template, preview before sending, and send."
   }
 }
