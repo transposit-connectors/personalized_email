@@ -6,30 +6,6 @@
         "alias": "google_mail"
       }],
       "operations": [{
-        "id": "send_html_email",
-        "function": {
-          "parameters": [{
-            "name": "to",
-            "type": "STRING"
-          }, {
-            "name": "subject",
-            "type": "STRING"
-          }, {
-            "name": "messageHtml",
-            "type": "STRING"
-          }, {
-            "name": "cc",
-            "type": "STRING"
-          }, {
-            "name": "threadId",
-            "type": "STRING"
-          }, {
-            "name": "from",
-            "type": "STRING"
-          }],
-          "js": "send_html_email.js"
-        }
-      }, {
         "id": "send_email",
         "function": {
           "parameters": [{
