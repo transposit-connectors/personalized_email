@@ -4,6 +4,9 @@
       "dependencies": [{
         "name": "transposit/google_mail:v1.*.*",
         "alias": "google_mail"
+      }, {
+        "name": "transposit/google_mail:v2.*.*",
+        "alias": "google_mail2"
       }],
       "operations": [{
         "id": "send_html_email",
