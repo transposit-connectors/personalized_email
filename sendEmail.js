@@ -1,7 +1,8 @@
 function run(params) {
-  return api.run("this.send_html_email", {
+  return api.run("google_mail.send_message", {
     to: params.email,
     messageHtml: params.body,
-    subject: params.subject
+    subject: params.subject,
+    userId: "me"
   });
 }
