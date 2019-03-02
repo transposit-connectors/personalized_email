@@ -1,6 +1,10 @@
 {
   "v2": {
     "transposit": {
+      "dependencies": [{
+        "name": "transposit/google_mail:v2.*.*",
+        "alias": "google_mail"
+      }],
       "operations": [{
         "id": "send_html_email",
         "function": {
