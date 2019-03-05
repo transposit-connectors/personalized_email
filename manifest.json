@@ -2,7 +2,7 @@
   "v2": {
     "transposit": {
       "dependencies": [{
-        "name": "transposit/google_mail:v2.*.*",
+        "name": "transposit/google_mail:v3.*.*",
         "alias": "google_mail"
       }],
       "operations": [{
